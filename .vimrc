@@ -1,3 +1,5 @@
+filetype off                  " required
+
 "  ============================================================================
 " Vim-plug initialization
 " Avoid modify this section, unless you are very sure of what you are doing
@@ -20,245 +22,175 @@ endif
 " Obscure hacks done, you can now modify the rest of the .vimrc as you wish :)
 
 " ============================================================================
-set encoding=UTF-8
-
-let g:python3_host_prog = $HOME . '/.pyenv/versions/3.6.5/envs/neovim3/bin/python'
-let g:python_host_prog = $HOME . '/.pyenv/versions/2.7.15/envs/neovim2/bin/python'
 
 let mapleader = ','
 
 call plug#begin('~/.config/nvim/plugged')
 
-" Common
-Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-Plug 'zchee/deoplete-go'
-Plug 'terryma/vim-multiple-cursors'
-Plug 'ctrlpvim/ctrlp.vim'           " CtrlP is installed to support tag finding in vim-go
-Plug 'w0rp/ale'
-Plug 'tpope/vim-surround'
-Plug 'junegunn/vim-easy-align'
-Plug 'scrooloose/nerdtree'
-Plug 'jistr/vim-nerdtree-tabs'
-Plug 'scrooloose/nerdcommenter'
-Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
-Plug 'junegunn/fzf.vim'
-Plug 'bling/vim-airline'
-Plug 'jeffkreeftmeijer/vim-numbertoggle'
-Plug 'sheerun/vim-polyglot'
-Plug 'tpope/vim-fugitive'
-Plug 'Shougo/neosnippet.vim'
-Plug 'Shougo/neosnippet-snippets'
-Plug 'Xuyuanp/nerdtree-git-plugin'
-Plug 'dyng/ctrlsf.vim'
+Plug 'vim-airline/vim-airline' " https://github.com/vim-airline/vim-airline
+Plug 'ryanoasis/vim-devicons'  " https://github.com/ryanoasis/vim-devicons + https://github.com/ryanoasis/nerd-fonts/
+Plug 'ctrlpvim/ctrlp.vim'      " https://github.com/ctrlpvim/ctrlp.vim
+Plug 'tpope/vim-commentary'    " https://github.com/tpope/vim-commentary
+Plug 'airblade/vim-gitgutter'  " https://github.com/airblade/vim-gitgutter
+Plug 'nvim-lua/plenary.nvim'
+Plug 'nvim-telescope/telescope.nvim'
+Plug 'mg979/vim-visual-multi', {'branch': 'master'}
 
-" Language support
-Plug 'lifepillar/pgsql.vim'         " PostgreSQL syntax highlighting
-Plug 'fatih/vim-go'                 " Golang support
-Plug 'sebdah/vim-delve'             " Golang debugger
-Plug 'zchee/deoplete-jedi', { 'do': ':UpdateRemotePlugins', 'for': 'python' } " Python autocomplete
-Plug 'davidhalter/jedi-vim', { 'for': 'python' }  " Python goto etc
-Plug 'tmhedberg/SimpylFold'         " Python folding
-Plug 'iamcco/markdown-preview.vim'  " Markdown live preview in browser
-Plug 'phanviet/vim-monokai-pro'
+Plug 'fenetikm/falcon'
 
+Plug 'fatih/vim-go', { 'do': ':GoInstallBinaries' } " https://github.com/fatih/vim-go
+Plug 'neoclide/coc.nvim', {'branch': 'release'}     " https://github.com/neoclide/coc.nvim
+
+" All of your Plugins must be added before the following line
 call plug#end()
+filetype plugin indent on    " required
+" To ignore plugin indent changes, instead use:
+"filetype plugin on
+"
+" Brief help
+" :PluginList       - lists configured plugins
+" :PluginInstall    - installs plugins; append `!` to update or just :PluginUpdate
+" :PluginSearch foo - searches for foo; append `!` to refresh local cache
+" :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
+"
+" see :h vundle for more details or wiki for FAQ
+" Put your non-Plugin stuff after this line
 
-set autoread
-set autoindent
-set autowrite
-set completeopt-=preview
-set cursorline
-set noerrorbells
+" Buffers shortcut
+nnoremap <leader>b :bNext <cr>
+
+" Set the search to case insensitive by default
+set ic
+
+" use Unicode
+set encoding=utf-8
+
+" make Backspace work like Delete
+set backspace=indent,eol,start
+
+" don't create `filename~` backups
+set nobackup
+
+" don't create temp files
 set noswapfile
-set novisualbell
-set smartindent
-set number relativenumber
 
-set ruler
-set ignorecase
+" line numbers and distances
+set relativenumber 
+set number
 
-" Colorscheme
-set termguicolors
-colorscheme monokai_pro
-
-" Font settings
-set guifont=Inconsolata:h13
-
-" Enable mouse if possible
-if has('mouse')
-    set mouse=a
-endif
-
-" Remove trailing white spaces on save
-autocmd BufWritePre * :%s/\s\+$//e
-set title
-
-" Autosave buffers before leaving them
-autocmd BufLeave * silent! :wa
-
-" Allow vim to set a custom font or color for a word
-syntax enable
-
-" Common indentation settings
+" indentation
 set noexpandtab
 set shiftwidth=4
 set tabstop=4
 
+" Indent new line the same as the preceding line
+set autoindent
 
-" Javascript
-autocmd FileType javascript set tabstop=2 shiftwidth=2 softtabstop=2 expandtab
+" statusline indicates insert or normal mode
+set showmode showcmd
 
-" Yaml
-au! BufNewFile,BufReadPost *.{yaml,yml} set filetype=yaml foldmethod=indent
-autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
+" make scrolling and painting fast
+" ttyfast kept for vim compatibility but not needed for nvim
+set ttyfast lazyredraw
 
+" highlight matching parens, braces, brackets, etc
+set showmatch
 
-" Jedi-vim ------------------------------
+" open new buffers without saving current modifications (buffer remains open)
+set hidden
 
-" Disable autocompletion (using deoplete instead)
-let g:jedi#completions_enabled = 0
+" StatusLine always visible, display full path
+" http://learnvimscriptthehardway.stevelosh.com/chapters/17.html
+set laststatus=2 statusline=%F
 
-" All these mappings work only for python code:
-" Go to definition
-let g:jedi#goto_command = ',d'
-" Find ocurrences
-let g:jedi#usages_command = ',o'
-" Find assignments
-let g:jedi#goto_assignments_command = ',a'
-" Go to definition in new tab
-nmap ,D :tab split<CR>:call jedi#goto()<CR>
-
-" Error and warning signs.
-let g:ale_sign_error = '‚§´'
-let g:ale_sign_warning = '‚ö†'
-" Enable integration with airline.
-let g:airline#extensions#ale#enabled = 1
-
-
-" Fix some common typos
-cnoreabbrev W! w!
-cnoreabbrev Q! q!
-cnoreabbrev Qall! qall!
-cnoreabbrev Wq wq
-cnoreabbrev Wa wa
-cnoreabbrev wQ wq
-cnoreabbrev WQ wq
-cnoreabbrev W w
-cnoreabbrev Q q
-cnoreabbrev Qall qall
-
-"----------------------------------------------
-" Splits
-"----------------------------------------------
-" Create horizontal splits below the current window
-set splitbelow
-set splitright
-
-" Creating splits
-nnoremap <leader>v :vsplit<cr>
-nnoremap <leader>h :split<cr>
-
-" Closing splits
-nnoremap <leader>q :close<cr>
-
-"----------------------------------------------
-" Plugin: 'ctrlpvim/ctrlp.vim'
-"----------------------------------------------
-" Note: We are not using CtrlP much in this configuration. But vim-go depend on
-" it to run GoDecls(Dir).
-
-" Disable the CtrlP mapping, since we want to use FZF instead for <c-p>.
-let g:ctrlp_map = ''
-
-"----------------------------------------------
-" Plugin: 'scrooloose/nerdtree'
-"----------------------------------------------
-noremap <leader>n :NERDTreeTabsToggle<CR>
-let g:NERDTreeShowHidden = 1
-let g:NERDTreeIgnore = ['\.pyc$', '^__pycache__$', 'egg-info$']
-"let NERDTreeMapOpenInTab='\r'
-"let NERDTreeMapOpenInTab='<ENTER>'
-"let NERDTreeMapOpenInTab='o'
-let g:nerdtree_tabs_open_on_gui_startup = 2
-let g:nerdtree_tabs_smart_startup_focus = 1
-
-
-"----------------------------------------------
-" Plugin: 'junegunn/fzf.vim'
-"----------------------------------------------
-" Note: We are not using CtrlP much in this configuration. But vim-go depend on
-" it to run GoDecls(Dir).
-
-
-" Disable the CtrlP mapping, since we want to use FZF instead for <c-p>.
-
-nnoremap <c-p> :FZF<cr>
-
-"----------------------------------------------
-" Plugin: 'w0rp/ale'
-"----------------------------------------------
-let g:ale_python_flake8_options = '--max-line-length=100'
-let g:ale_python_pylint_options = '--max-line-length=100 --no-docstring-rgx=test'
-let g:ale_linters = {
-\    'javascript': ['eslint'],
-\    'python': ['flake8']
-\}
-
-"----------------------------------------------
-" Plugin: 'sheerun/vim-polyglot'
-"----------------------------------------------
-let g:polyglot_disabled = ['md', 'markdown']
-
-"----------------------------------------------
-" Plugin: 'tmhedberg/SimpylFold'
-"----------------------------------------------
-let g:SimpylFold_docstring_preview	= 0
-let g:SimpylFold_fold_docstring		= 1
-let b:SimpylFold_fold_docstring		= 1
-let g:SimpylFold_fold_import		= 0
-let b:SimpylFold_fold_import		= 0
-
-"----------------------------------------------
-" Plugin: 'Shougo/neosnippet'
-"----------------------------------------------
-
-imap <C-k>     <Plug>(neosnippet_expand_or_jump)
-smap <C-k>     <Plug>(neosnippet_expand_or_jump)
-xmap <C-k>     <Plug>(neosnippet_expand_target)
-
-
-" SuperTab like snippets behavior.
-" Note: It must be "imap" and "smap".  It uses <Plug> mappings.
-"imap <expr><TAB>
-" \ pumvisible() ? "\<C-n>" :
-" \ neosnippet#expandable_or_jumpable() ?
-" \    "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
-smap <expr><TAB> neosnippet#expandable_or_jumpable() ?
-\ "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
-
-" For conceal markers.
-if has('conceal')
-  set conceallevel=2 concealcursor=niv
-endif
-
-"----------------------------------------------
-" Plugin: 'dyng/ctrlsf.vim'
-"----------------------------------------------
-let g:ctrlsf_default_view_mode = 'compact'
-let g:ctrlsf_auto_focus = {
-\ "at": "start"
-\ }
-
-
-" for copy inside the clipboard
+" Use system clipboard
+" http://vim.wikia.com/wiki/Accessing_the_system_clipboard
+" for linux
+"set clipboard=unnamedplus
+" for macOS
 set clipboard+=unnamedplus
 
-map <C-t><up> :tabr<cr>
-map <C-t><down> :tabl<cr>
-map <C-t><left> :tabp<cr>
-map <C-t><right> :tabn<cr>
+syntax enable
+" Neovim only
+set termguicolors
 
-nmap     <C-F>f <Plug>CtrlSFPrompt
-nmap     <C-F>n <Plug>CtrlSFCwordPath
-nmap     <C-F>p <Plug>CtrlSFPwordPath
+" Dark scheme
+colorscheme falcon
+set background=dark
 
+" higlight current line
+set cursorline
+
+" netrw
+nnoremap - :Explore<CR>
+let g:netrw_banner = 0
+let g:netrw_liststyle = 3
+let g:netrw_bufsettings = 'noma nomod nu nobl nowrap ro'
+autocmd FileType netrw setl bufhidden=delete
+
+"-- netrw END
+
+" vim-gitgutter
+set updatetime=500
+
+"-- coc.nvim specific configuration
+set cmdheight=2
+set updatetime=300
+set shortmess+=c
+if has("patch-8.1.1564")
+  set signcolumn=number
+else
+  set signcolumn=yes
+endif
+
+nmap <silent> gr <Plug>(coc-references)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> rn <Plug>(coc-rename)
+
+nnoremap <silent> K :call <SID>show_documentation()<CR>
+function! s:show_documentation()
+  if (index(['vim','help'], &filetype) >= 0)
+    execute 'h '.expand('<cword>')
+  else
+    call CocAction('doHover')
+  endif
+endfunction
+
+"-- vim-go specific configuration
+
+" run :GoBuild or :GoTestCompile based on the go file
+function! s:build_go_files()
+  let l:file = expand('%')
+  if l:file =~# '^\f\+_test\.go$'
+    call go#test#Test(0, 1)
+  elseif l:file =~# '^\f\+\.go$'
+    call go#cmd#Build(0)
+  endif
+endfunction
+
+autocmd FileType go nmap <leader>b :<C-u>call <SID>build_go_files()<CR>
+autocmd FileType go nmap <Leader>c <Plug>(go-coverage-toggle)
+autocmd FileType go nmap <leader>t <Plug>(go-test)
+
+autocmd Filetype go command! -bang A call go#alternate#Switch(<bang>0, 'edit')
+autocmd Filetype go command! -bang AV call go#alternate#Switch(<bang>0, 'vsplit')
+autocmd Filetype go command! -bang AS call go#alternate#Switch(<bang>0, 'split')
+autocmd Filetype go command! -bang AT call go#alternate#Switch(<bang>0, 'tabe')
+
+autocmd FileType go setlocal foldmethod=expr foldexpr=getline(v:lnum)=~'^\s*'.&commentstring[0]
+
+let g:go_list_type = "quickfix"    " error lists are of type quickfix
+let g:go_fmt_command = "goimports" " automatically format and rewrite imports
+let g:go_auto_sameids = 1          " highlight matching identifiers
+
+" Telescope
+nnoremap <leader>ff <cmd>Telescope find_files<cr>
+nnoremap <leader>fg <cmd>Telescope live_grep<cr>
+nnoremap <leader>fb <cmd>Telescope buffers<cr>
+nnoremap <leader>fh <cmd>Telescope help_tags<cr>
+nnoremap <expr> <leader>fw ':Telescope live_grep<cr>' . "'" . expand('<cword>')
+vnoremap <expr> <leader>fw 'zy:Telescope live_grep<cr>' . expand('<C-r>z')
+" nnoremap <leader>ff <cmd>lua require('telescope.builtin').find_files()<cr>
+" nnoremap <leader>fg <cmd>lua require('telescope.builtin').live_grep()<cr>
+" nnoremap <leader>fb <cmd>lua require('telescope.builtin').buffers()<cr>
+" nnoremap <leader>fh <cmd>lua require('telescope.builtin').help_tags()<cr>
