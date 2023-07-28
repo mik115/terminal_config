@@ -1,5 +1,4 @@
 filetype off                  " required
-
 "  ============================================================================
 " Vim-plug initialization
 " Avoid modify this section, unless you are very sure of what you are doing
@@ -27,19 +26,34 @@ let mapleader = ','
 
 call plug#begin('~/.config/nvim/plugged')
 
+" Tag line at the bottom of the screen
 Plug 'vim-airline/vim-airline' " https://github.com/vim-airline/vim-airline
-Plug 'ryanoasis/vim-devicons'  " https://github.com/ryanoasis/vim-devicons + https://github.com/ryanoasis/nerd-fonts/
+" Search throgh file and other
 Plug 'ctrlpvim/ctrlp.vim'      " https://github.com/ctrlpvim/ctrlp.vim
+" Utility for comments
 Plug 'tpope/vim-commentary'    " https://github.com/tpope/vim-commentary
 Plug 'airblade/vim-gitgutter'  " https://github.com/airblade/vim-gitgutter
+" used by telescope
 Plug 'nvim-lua/plenary.nvim'
-Plug 'nvim-telescope/telescope.nvim'
+Plug 'nvim-telescope/telescope.nvim', { 'tag': '0.1.0' }
+" Multiple cursors in vim
 Plug 'mg979/vim-visual-multi', {'branch': 'master'}
+
+Plug 'preservim/nerdtree' |
+            \ Plug 'Xuyuanp/nerdtree-git-plugin'
+Plug 'jistr/vim-nerdtree-tabs'
+Plug 'Nopik/vim-nerdtree-direnter'
+
+" RUST autocompletion and syntax support
+Plug 'racer-rust/vim-racer'
+Plug 'rust-lang/rust.vim'
 
 Plug 'fenetikm/falcon'
 
 Plug 'fatih/vim-go', { 'do': ':GoInstallBinaries' } " https://github.com/fatih/vim-go
 Plug 'neoclide/coc.nvim', {'branch': 'release'}     " https://github.com/neoclide/coc.nvim
+
+Plug 'ryanoasis/vim-devicons'  " https://github.com/ryanoasis/vim-devicons + https://github.com/ryanoasis/nerd-fonts/
 
 " All of your Plugins must be added before the following line
 call plug#end()
@@ -58,7 +72,6 @@ filetype plugin indent on    " required
 
 " Buffers shortcut
 nnoremap <leader>b :bNext <cr>
-
 " Set the search to case insensitive by default
 set ic
 
@@ -183,14 +196,34 @@ let g:go_list_type = "quickfix"    " error lists are of type quickfix
 let g:go_fmt_command = "goimports" " automatically format and rewrite imports
 let g:go_auto_sameids = 1          " highlight matching identifiers
 
-" Telescope
+
+" TABS AND OTHER COMMAND
+nmap <F2> :tabnew<CR>
+nmap <F3> :tabclose<CR>
+nmap <F4> :call ToggleQuickfixList()<CR>
+nmap <F7> :NERDTreeTabsToggle<CR>
+nmap <leader>p :tabprevious<CR>
+nmap <leader>n :tabnext<CR>
+nmap <leader>Down :bprev<CR>
+nmap <leader>Up :bnext<CR>
+nnoremap <C-j> <C-w>j
+nnoremap <C-k> <C-w>k
+nnoremap <C-h> <C-w>h
+nnoremap <C-l> <C-w>l
+
+" --------- RACER --------------
+let g:racer_experimental_completer = 1
+let g:racer_insert_paren = 1
+
+" --------- NERD TREE ----------
+let NERDTreeMapOpenInTab='<ENTER>'
+let NERDTreeShowHidden=1
+
+" ------------- Telescope --------------
 nnoremap <leader>ff <cmd>Telescope find_files<cr>
 nnoremap <leader>fg <cmd>Telescope live_grep<cr>
 nnoremap <leader>fb <cmd>Telescope buffers<cr>
 nnoremap <leader>fh <cmd>Telescope help_tags<cr>
-nnoremap <expr> <leader>fw ':Telescope live_grep<cr>' . "'" . expand('<cword>')
-vnoremap <expr> <leader>fw 'zy:Telescope live_grep<cr>' . expand('<C-r>z')
-" nnoremap <leader>ff <cmd>lua require('telescope.builtin').find_files()<cr>
-" nnoremap <leader>fg <cmd>lua require('telescope.builtin').live_grep()<cr>
-" nnoremap <leader>fb <cmd>lua require('telescope.builtin').buffers()<cr>
-" nnoremap <leader>fh <cmd>lua require('telescope.builtin').help_tags()<cr>
+nnoremap <expr> <leader>fw ':Telescope live_grep<cr>'. 'i' . expand('<cword>'). '<Esc>'
+vnoremap <expr> <leader>fw '"zyy<cr>:Telescope live_grep<cr>'. 'i' . expand('<C-r>z') . '<Esc>'
+

@@ -1,4 +1,4 @@
-ZSH_THEME_GIT_PROMPT_PREFIX="%{$reset_color%}%{$fg[white]%}["
+ZSH_THEME_GIT_PROMPT_PREFIX="%{$reset_color%}%{$fg[white]%}[ "
 ZSH_THEME_GIT_PROMPT_SUFFIX=""
 ZSH_THEME_GIT_PROMPT_DIRTY="%{$fg_bold[red]%}*%{$reset_color%}%{$fg[white]%}]%{$reset_color%} "
 ZSH_THEME_GIT_PROMPT_CLEAN="]%{$reset_color%} "
@@ -26,10 +26,32 @@ kube_status() {
 }
 
 prompt_ip() {
-	dig TXT +short o-o.myaddr.l.google.com @ns1.google.com | awk -F'"' '{ print $2}'
+	curl -s icanhazip.com
+}
+
+
+tf_prompt_info() {
+  # dont show 'default' workspace in home dir
+  [[ "$PWD" != ~ ]] || return
+  if [ -d .terraform ]; then
+    workspace=$(terraform workspace show 2> /dev/null) || return
+    echo "[ ${workspace}]"
+  fi
+}
+
+prompt_cf() {
+  # print the cloudfoundry target information
+  if [ -z $CF_HOME ]; then
+    cf_home=~/.cf;
+  else
+    cf_home=$CF_HOME;
+  fi
+  organization=`cat $cf_home/config.json | jq '.OrganizationFields.Name' | tr -d '"'`
+  space=`cat $cf_home/config.json | jq '.SpaceFields.Name' | tr -d '"'`
+  echo "[ $organization/$space]"
 }
 
 
 RPS1='%{$fg_bold[blue]%}$(kube_status)%{$reset_color%} %{$fg_bold[red]%}$(prompt_ip)%{$reset_color%}'
-PROMPT='%{$fg_bold[green]%}%2~%{$reset_color%} $(vcs_status) ¬ª%b '
+PROMPT='%{$fg_bold[green]%}%2~%{$reset_color%} $(vcs_status) $(tf_prompt_info) $(prompt_cf) » %b '
 
